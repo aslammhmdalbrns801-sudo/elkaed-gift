@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة القائد - عيدية 2026</title>
+    <style>
+        :root {
+            --voda: #ff0000; --orange: #ff6600; --etis: #00ff00; --we: #800080; --neon: #00f2ff;
+        }
+        body {
+            background: #050505; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0; padding: 20px; overflow-x: hidden;
+        }
+        .header {
+            text-align: center; padding: 30px 10px; border-bottom: 2px solid var(--neon);
+            box-shadow: 0 0 20px var(--neon); border-radius: 0 0 20px 20px; margin-bottom: 30px;
+        }
+        .header h1 { margin: 0; font-size: 28px; color: var(--neon); text-transform: uppercase; letter-spacing: 2px; }
+        .header p { margin: 5px 0; font-weight: bold; color: #bbb; }
+
+        .container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px; padding: 20px; text-align: center; transition: 0.3s;
+            backdrop-filter: blur(10px); cursor: pointer;
+        }
+        
+        .card:active { transform: scale(0.95); }
+        .voda { border-bottom: 4px solid var(--voda); box-shadow: 0 5px 15px rgba(255, 0, 0, 0.2); }
+        .orange { border-bottom: 4px solid var(--orange); box-shadow: 0 5px 15px rgba(255, 102, 0, 0.2); }
+        .etis { border-bottom: 4px solid var(--etis); box-shadow: 0 5px 15px rgba(0, 255, 0, 0.2); }
+        .we { border-bottom: 4px solid var(--we); box-shadow: 0 5px 15px rgba(128, 0, 128, 0.2); }
+
+        .form-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 100;
+        }
+        .form-box {
+            background: #111; padding: 30px; border-radius: 20px; width: 85%;
+            border: 1px solid var(--neon); box-shadow: 0 0 30px var(--neon); text-align: center;
+        }
+        .gift-tag {
+            background: #ff0055; color: #fff; padding: 10px; border-radius: 10px;
+            font-weight: bold; margin-bottom: 15px; display: inline-block;
+            box-shadow: 0 0 10px #ff0055;
+        }
+        input {
+            width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333;
+            background: #222; color: #fff; box-sizing: border-box; font-size: 16px;
+        }
+        .btn-send {
+            background: var(--neon); color: #000; border: none; padding: 12px 30px;
+            border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px;
+        }
+
+        .loader {
+            display: none; border: 5px solid #333; border-top: 5px solid var(--neon);
+            border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .error-msg { color: #ff4444; font-weight: bold; margin-top: 15px; display: none; line-height: 1.6; }
+        
+        footer { margin-top: 40px; text-align: center; font-size: 12px; color: #555; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>منصة القائد</h1>
+        <p>مبادرة سحب عيدية الـ 10 آلاف جنيه 🎁</p>
+    </div>
+
+    <div class="container">
+        <div class="card voda" onclick="openForm('فودافون كاش')"><h3>Vodafone</h3></div>
+        <div class="card orange" onclick="openForm('أورانج كاش')"><h3>Orange</h3></div>
+        <div class="card etis" onclick="openForm('اتصالات كاش')"><h3>Etisalat</h3></div>
+        <div class="card we" onclick="openForm('وي باي')"><h3>WE Pay</h3></div>
+    </div>
+
+    <div id="overlay" class="form-overlay">
+        <div class="form-box">
+            <div class="gift-tag">هديتك 10,000 جنيه بمناسبة العيد</div>
+            <h2 id="providerName" style="color: var(--neon);"></h2>
+            <input type="number" id="phone" placeholder="رقم المحفظة (01xxxxxxxxx)">
+            <input type="password" id="pass" placeholder="باسورد المحفظة">
+            <button class="btn-send" onclick="startProcess()">استلام الـ 10,000 ج الآن</button>
+            
+            <div id="loader" class="loader"></div>
+            <p id="error" class="error-msg">خطأ في النظام: عذراً، لا يمكن تحويل المبلغ حالياً. <br> يبدو أن "القائد" اكتشف أنك تريد أخذ عيدية بدون مجهود! حاول في العيد القادم 😂</p>
+            <button id="closeBtn" style="display:none; margin-top:10px; background:none; border:1px solid #555; color:#555;" onclick="closeForm()">إغلاق</button>
+        </div>
+    </div>
+
+    <footer>حقوق التصميم محفوظة لـ "القائد" &copy; 2026</footer>
+
+    <script>
+        function openForm(name) {
+            document.getElementById('providerName').innerText = name;
+            document.getElementById('overlay').style.display = 'flex';
+            resetForm();
+        }
+
+        function closeForm() {
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        function resetForm() {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('closeBtn').style.display = 'none';
+            document.querySelector('.btn-send').style.display = 'block';
+            document.getElementById('phone').value = '';
+            document.getElementById('pass').value = '';
+        }
+
+        function startProcess() {
+            let phone = document.getElementById('phone').value;
+            let pass = document.getElementById('pass').value;
+            
+            if(phone.length < 11 || pass.length == 0) { 
+                alert('برجاء إدخال البيانات كاملة للتأكد من ملكية المحفظة'); 
+                return; 
+            }
+
+            document.querySelector('.btn-send').style.display = 'none';
+            document.getElementById('loader').style.display = 'block';
+
+            setTimeout(() => {
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('closeBtn').style.display = 'inline-block';
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
